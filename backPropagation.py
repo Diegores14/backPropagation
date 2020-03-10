@@ -37,6 +37,10 @@ class neuronalNetwork:
         arg=1/(1+np.exp(-x))
         return np.multiply(arg, 1-arg) if derivative else arg
 
+    def softmax( self, x, derivate=False ):
+        arg = np.exp( x )
+        return arg if derivate else arg/np.sum( arg, axis=0 )
+
     def train( self, A, T, iter ):
         self.m = A.shape[1]
         for i in range( iter ):
@@ -61,10 +65,12 @@ class neuronalNetwork:
         self.B = self.B - self.alpha*np.sum( self.dZ[l], axis = 1 )
         l -= 1
         while( 0 < l ):
-            self.dZ[l] = np.dot(np.transpose( self.W[l+1] ), np.multiply( self.dZ[l+1], self.f[self.activation]( self.Z[l], True ) ) )
+            self.dZ[l] = np.multiply( np.dot( np.transpose( self.W[l+1] ), self.dZ[l+1] ), self.f[self.activation]( self.Z[l], True ) )
             dw = np.dot( self.dZ[l], np.transpose( self.A[l-1] ) )
             self.W[l] = self.W[l] - self.alpha*dw
-            self.B = self.B - self.alpha*np.sum( self.dZ[l], axis = 1 )
+            db = np.sum( self.dZ[l], axis = 1 )
+            db = db.reshape( (db.shape[0], 1) )
+            self.B[l] = self.B[l] - self.alpha*db
             l -= 1
 
     def Error( self, T ):
@@ -72,11 +78,11 @@ class neuronalNetwork:
 
 
 # Testing
-RN = neuronalNetwork( [2,2,1], 'sigmoid' )
-A = np.array( [[0, 1, 0, 1],
-        [0, 0, 1, 1]])
-T = np.array( [[0, 1, 1, 0]] )
-RN.train(A, T, 10000)
-print( RN.forward(A) )
-print( RN.W )
-print( RN.B )
+# RN = neuronalNetwork( [2,2,1], 'relu' )
+# A = np.array( [[0, 1, 0, 1],
+#             [0, 0, 1, 1]])
+# T = np.array( [[0, 1, 1, 0]] )
+# RN.train(A, T, 50000)
+# print( RN.forward(A) )
+# print( RN.W )
+# print( RN.B )
