@@ -53,19 +53,19 @@ class neuronalNetwork:
         self.A[0] = A
         while l <= self.L:
             self.Z[l] = np.dot( self.W[l], self.A[l-1] ) + self.B[l]
-            self.A[l] = self.f[self.activation]( self.Z[l] )
+            self.A[l] = self.f[self.activation[l-1]]( self.Z[l] )
             l += 1
         return self.A[self.L]
 
     def Backward( self, T ):
         l = self.L
-        self.dZ[l] = (-1.0/self.m)*np.multiply( (T - self.A[l]), self.f[self.activation]( self.Z[l], True ) )
+        self.dZ[l] = (-1.0/self.m)*np.multiply( (T - self.A[l]), self.f[self.activation[l-1]]( self.Z[l], True ) )
         dw = np.dot( self.dZ[l], np.transpose( self.A[l-1] ) )
         self.W[l] = self.W[l] - self.alpha*dw
         self.B = self.B - self.alpha*np.sum( self.dZ[l], axis = 1 )
         l -= 1
         while( 0 < l ):
-            self.dZ[l] = np.multiply( np.dot( np.transpose( self.W[l+1] ), self.dZ[l+1] ), self.f[self.activation]( self.Z[l], True ) )
+            self.dZ[l] = np.multiply( np.dot( np.transpose( self.W[l+1] ), self.dZ[l+1] ), self.f[self.activation[l-1]]( self.Z[l], True ) )
             dw = np.dot( self.dZ[l], np.transpose( self.A[l-1] ) )
             self.W[l] = self.W[l] - self.alpha*dw
             db = np.sum( self.dZ[l], axis = 1 )
